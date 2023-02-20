@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/3dbdbd43-ea93-4857-9aa7-f84da9728669/resourceGroups/NodeAppWin-rg/subscriptions/3dbdbd43-ea93-4857-9aa7-f84da9728669/resourceGroups/NodeAppWin-rg/providers/Microsoft.Web/sites/NodeWebsiteWindows",
+    "appService.deploySubpath": "."
+}
