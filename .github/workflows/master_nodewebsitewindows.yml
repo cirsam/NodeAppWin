@@ -41,16 +41,16 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
+      - name: Save state
+        run: echo "{name}={value}" >> $GITHUB_STATE
+        
+      - name: Set output
+        run: echo "{name}={value}" >> $GITHUB_OUTPUT
+        
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:
           name: node-app
-
-      - name: Save state
-        run: echo "{name}={value}" >> $GITHUB_STATE
-
-      - name: Set output
-        run: echo "{name}={value}" >> $GITHUB_OUTPUT
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
