@@ -1,0 +1,22 @@
+{
+  "name": "nodeappwin",
+  "version": "1.0.0",
+  "description": "node testing app",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cirsam/NodeAppWin.git"
+  },
+  "author": "Samuel Antwi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cirsam/NodeAppWin/issues"
+  },
+  "homepage": "https://github.com/cirsam/NodeAppWin#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
