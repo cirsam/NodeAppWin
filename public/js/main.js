@@ -28,6 +28,7 @@ var room = prompt('Enter room name:');
 var socket = io.connect();
 
 if (room !== '') {
+  console.log("why not emit");
   socket.emit('create or join', room);
   console.log('Attempted to create or  join room', room);
 }
@@ -36,13 +37,15 @@ if (room !== '') {
 socket.on('created', function(room) {
   console.log('Created room ' + room);
   isInitiator = true;
+  socket.emit('initiator', room);
+
 });
 
 socket.on('full', function(room) {
   console.log('Room ' + room + ' is full');
 });
 
-socket.on('join', function (room){
+socket.on('initiator', function (room){
   console.log('Another peer made a request to join room ' + room);
   console.log('This peer is the initiator of room ' + room + '!');
   isChannelReady = true;
@@ -62,9 +65,14 @@ socket.on('log', function(array) {
 socket.on('message', function(message, room) {
     console.log('Client received message:', message,  room);
     if (message === 'got user media') {
+      console.log("got here 1");
       maybeStart();
     } else if (message.type === 'offer') {
+      console.log("got here 2");
+
       if (!isInitiator && !isStarted) {
+        console.log("got here 3");
+
         maybeStart();
       }
       pc.setRemoteDescription(new RTCSessionDescription(message));
@@ -119,7 +127,7 @@ console.log('Getting user media with constraints', localStreamConstraints);
 //If initiator, create the peer connection
 function maybeStart() {
   console.log('>>>>>>> maybeStart() ', isStarted, localStream, isChannelReady);
-  if (!isStarted && typeof localStream !== 'undefined' && isChannelReady) {
+  if (!isStarted && typeof localStream !== 'undefined' ) {
     console.log('>>>>>> creating peer connection');
     createPeerConnection();
     pc.addStream(localStream);
