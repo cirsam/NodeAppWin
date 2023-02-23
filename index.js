@@ -38,20 +38,22 @@ io.sockets.on('connection', function(socket) {
 	  log('Client said: ', message);
 	  // for a real app, would be room-only (not broadcast)
 	  socket.in(room).emit('message', message, room);
+      if(message === 'bye'){
+        socket.in(room).emit('bye');
+      }
 	});
   
 	socket.on('create or join', function(room) {
 	  log('Received request to create or join room ' + room);
   
-	  var clientsInRoom = io.sockets.adapter.rooms[room];
-	  var numClients = clientsInRoom ? Object.keys(clientsInRoom.sockets).length : 0;
+	  var clientsInRoom = io.sockets.adapter.rooms.has(room);
+      var numClients = clientsInRoom ? io.sockets.adapter.rooms.get(room)?.size : 0;
 	  log('Room ' + room + ' now has ' + numClients + ' client(s)');
   
 	  if (numClients === 0) {
 		socket.join(room);
 		log('Client ID ' + socket.id + ' created room ' + room);
 		socket.emit('created', room, socket.id);
-  
 	  } else if (numClients === 1) {
 		log('Client ID ' + socket.id + ' joined room ' + room);
 		io.sockets.in(room).emit('join', room);
@@ -74,8 +76,8 @@ io.sockets.on('connection', function(socket) {
 	  }
 	});
   
-	socket.on('bye', function(){
-	  console.log('received bye');
+	socket.on('bye', function(room){
+	  console.log('received bye'+room);
 	});
   
   });

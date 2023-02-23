@@ -26,9 +26,7 @@ var room = prompt('Enter room name:');
 
 //Initializing socket.io
 var socket = io.connect();
-
-if (room !== '') {
-  console.log("why not emit");
+if (room !== null && typeof room !== null) {
   socket.emit('create or join', room);
   console.log('Attempted to create or  join room', room);
 }
@@ -37,15 +35,14 @@ if (room !== '') {
 socket.on('created', function(room) {
   console.log('Created room ' + room);
   isInitiator = true;
-  socket.emit('initiator', room);
-
+  createRoom();
 });
 
 socket.on('full', function(room) {
   console.log('Room ' + room + ' is full');
 });
 
-socket.on('initiator', function (room){
+socket.on('join', function (room){
   console.log('Another peer made a request to join room ' + room);
   console.log('This peer is the initiator of room ' + room + '!');
   isChannelReady = true;
@@ -54,6 +51,7 @@ socket.on('initiator', function (room){
 socket.on('joined', function(room) {
   console.log('joined: ' + room);
   isChannelReady = true;
+  createRoom();
 });
 
 socket.on('log', function(array) {
@@ -65,14 +63,9 @@ socket.on('log', function(array) {
 socket.on('message', function(message, room) {
     console.log('Client received message:', message,  room);
     if (message === 'got user media') {
-      console.log("got here 1");
       maybeStart();
     } else if (message.type === 'offer') {
-      console.log("got here 2");
-
       if (!isInitiator && !isStarted) {
-        console.log("got here 3");
-
         maybeStart();
       }
       pc.setRemoteDescription(new RTCSessionDescription(message));
@@ -99,17 +92,17 @@ function sendMessage(message, room) {
 }
 
 
-
-//Displaying Local Stream and Remote Stream on webpage
-var localVideo = document.querySelector('#localVideo');
-var remoteVideo = document.querySelector('#remoteVideo');
-console.log("Going to find Local media");
-navigator.mediaDevices.getUserMedia(localStreamConstraints)
-.then(gotStream)
-.catch(function(e) {
-  alert('getUserMedia() error: ' + e.name);
-});
-
+function createRoom(){
+  //Displaying Local Stream and Remote Stream on webpage
+  var localVideo = document.querySelector('#localVideo');
+  var remoteVideo = document.querySelector('#remoteVideo');
+  console.log("Going to find Local media");
+  navigator.mediaDevices.getUserMedia(localStreamConstraints)
+  .then(gotStream)
+  .catch(function(e) {
+    alert('getUserMedia() error: ' + e.name);
+  });
+}
 //If found local stream
 function gotStream(stream) {
   console.log('Adding local stream.');
@@ -127,7 +120,7 @@ console.log('Getting user media with constraints', localStreamConstraints);
 //If initiator, create the peer connection
 function maybeStart() {
   console.log('>>>>>>> maybeStart() ', isStarted, localStream, isChannelReady);
-  if (!isStarted && typeof localStream !== 'undefined' ) {
+  if (!isStarted && typeof localStream !== 'undefined' && isChannelReady) {
     console.log('>>>>>> creating peer connection');
     createPeerConnection();
     pc.addStream(localStream);
@@ -140,9 +133,9 @@ function maybeStart() {
 }
 
 //Sending bye if user closes the window
-window.onbeforeunload = function() {
-  sendMessage('bye', room);
-};
+//window.onbeforeunload = function() {
+ // sendMessage('bye', room);
+//};
 
 
 //Creating peer connection
