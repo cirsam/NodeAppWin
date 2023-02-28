@@ -14,7 +14,7 @@
 
 <body class="h-100">
   <div class="h-100" id="video_display">
-
+    <div><input type="text" name="roomName" id="roomName" placeholder="Enter room name"/><button onclick="enterIn()">Go!</button></div>
     <div id ="video_container" class="align-items-center" style="margin-top: 10%;">
       <div class="local_div" id="div1" style="display: block;">
 				<video id="localVideo" class="" autoplay muted playsinline></video>
@@ -24,6 +24,24 @@
 			</div>
     </div>
     <button onclick="hangup()">Hangup</button>
+  </div>
+  <div id="view-buttons">
+    <button class="view-button" id="share-button"><i id="share-button-icon" class="fas fa-eye"></i></button>
+    <button class="view-button" style="display: none" id="stop-share-button"><i id="stop-share-button-icon"
+        class="fas fa-eye-slash"></i></button>
+    <button class="view-button" id="share-file-button"><i class="far fa-file-alt"></i></button>
+  </div>
+  <div id="select-file-dialog" style="display: block;">
+    <div id="dialog-content">
+      <div id="select-file">
+        <div id="label">Select a file:</div>
+        <input type="file" id="select-file-input">
+      </div>
+      <div id="dialog-footer">
+        <button id="ok-button" onclick="shareFile()" >Ok</button>
+        <button id="cancel-button" class="cancel-button">Cancel</button>
+      </div>
+    </div>
   </div>
 
   <!-- Import SocketIO for signalling -->
