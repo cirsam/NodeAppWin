@@ -21,7 +21,7 @@ server.listen(process.env.PORT || 3000);
 
 var io = socketIO(server);
 
-io.sockets.on('connection', function(socket) {
+io.sockets.on('connection', function(wsServer) {
 
 	// Convenience function to log server messages on the client.
 	// Arguments is an array like object which contains all the arguments of log(). 
@@ -29,21 +29,18 @@ io.sockets.on('connection', function(socket) {
 	function log() {
 	  var array = ['Message from server:'];
 	  array.push.apply(array, arguments);
-	  socket.emit('log', array);
+	  wsServer.emit('log', array);
 	}
   
     
     //Defining Socket Connections
-    socket.on('message', function(message, room) {
+    wsServer.on('message', function(message, room) {
 	  log('Client said: ', message);
 	  // for a real app, would be room-only (not broadcast)
-	  socket.in(room).emit('message', message, room);
-      if(message === 'bye'){
-        socket.in(room).emit('bye');
-      }
+	  wsServer.in(room).emit('message', message, room);
 	});
   
-	socket.on('create or join', function(room) {
+	wsServer.on('create or join', function(room) {
 	  log('Received request to create or join room ' + room);
   
 	  var clientsInRoom = io.sockets.adapter.rooms.has(room);
@@ -51,32 +48,32 @@ io.sockets.on('connection', function(socket) {
 	  log('Room ' + room + ' now has ' + numClients + ' client(s)');
   
 	  if (numClients === 0) {
-		socket.join(room);
-		log('Client ID ' + socket.id + ' created room ' + room);
-		socket.emit('created', room, socket.id);
+		wsServer.join(room);
+		log('Client ID ' + wsServer.id + ' created room ' + room);
+		wsServer.emit('created', room, wsServer.id);
 	  } else if (numClients === 1) {
-		log('Client ID ' + socket.id + ' joined room ' + room);
+		log('Client ID ' + wsServer.id + ' joined room ' + room);
 		io.sockets.in(room).emit('join', room);
-		socket.join(room);
-		socket.emit('joined', room, socket.id);
+		wsServer.join(room);
+		wsServer.emit('joined', room, wsServer.id);
 		io.sockets.in(room).emit('ready');
 	  } else { // max two clients
-		socket.emit('full', room);
+		wsServer.emit('full', room);
 	  }
 	});
   
-	socket.on('ipaddr', function() {
+	wsServer.on('ipaddr', function() {
 	  var ifaces = os.networkInterfaces();
 	  for (var dev in ifaces) {
 		ifaces[dev].forEach(function(details) {
 		  if (details.family === 'IPv4' && details.address !== '127.0.0.1') {
-			socket.emit('ipaddr', details.address);
+			wsServer.emit('ipaddr', details.address);
 		  }
 		});
 	  }
 	});
   
-	socket.on('bye', function(room){
+	wsServer.on('bye', function(room){
 	  console.log('received bye'+room);
 	});
   
